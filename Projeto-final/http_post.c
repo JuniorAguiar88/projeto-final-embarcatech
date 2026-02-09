@@ -20,9 +20,9 @@ static void dns_callback(const char *name, const ip_addr_t *ipaddr, void *callba
     if (ipaddr) {
         server_ip = *ipaddr;
         ip_ready = true;
-        printf("[HTTP] ✅ DNS resolvido: %s -> %s\n", name, ipaddr_ntoa(&server_ip));
+        printf("[HTTP]  DNS resolvido: %s -> %s\n", name, ipaddr_ntoa(&server_ip));
     } else {
-        printf("[HTTP] ❌ Falha na resolução DNS para: %s\n", name);
+        printf("[HTTP]  Falha na resolução DNS para: %s\n", name);
         ip_ready = false;
     }
 }
@@ -45,7 +45,7 @@ static err_t tcp_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err) 
         return ERR_OK;
     }
 
-    // Usa buffers globais seguros (sem conversões ilegais)
+    // Usa buffers globais seguros
     char payload[100];
     snprintf(payload, sizeof(payload), 
         "{\"temperatura\":%.1f,\"umidade\":%.1f,\"status\":\"%s\"}",
@@ -80,14 +80,14 @@ static err_t tcp_connected_callback(void *arg, struct tcp_pcb *tpcb, err_t err) 
 void http_init(void) {
     printf("[HTTP] Inicializando cliente HTTP...\n");
     
-    // ✅ CORREÇÃO: Detecta se é IP ou hostname
+    
     if (is_ip_address(HTTP_SERVER_IP)) {
         // Converte string IP diretamente para estrutura lwIP (SEM DNS!)
         if (ipaddr_aton(HTTP_SERVER_IP, &server_ip)) {
             ip_ready = true;
-            printf("[HTTP] ✅ IP direto configurado: %s\n", HTTP_SERVER_IP);
+            printf("[HTTP]  IP direto configurado: %s\n", HTTP_SERVER_IP);
         } else {
-            printf("[HTTP] ❌ IP inválido: %s\n", HTTP_SERVER_IP);
+            printf("[HTTP]  IP inválido: %s\n", HTTP_SERVER_IP);
             ip_ready = false;
         }
     } else {
@@ -98,7 +98,7 @@ void http_init(void) {
         dns_gethostbyname(HTTP_SERVER_IP, &server_ip, dns_callback, NULL);
         cyw43_arch_lwip_end();
         
-        // Aguarda resolução (máx 2s)
+        // Aguarda resolução (2s)
         uint32_t timeout = 2000;
         while (!ip_ready && timeout > 0) {
             sleep_ms(10);
@@ -106,14 +106,14 @@ void http_init(void) {
             timeout -= 10;
         }
         if (!ip_ready) {
-            printf("[HTTP] ⚠️ Timeout DNS para hostname\n");
+            printf("[HTTP]  Timeout DNS para hostname\n");
         }
     }
 }
 
 bool http_post_json(float temperatura, float umidade, const char* status) {
     if (!ip_ready) {
-        printf("[HTTP] ❌ IP/hostname não resolvido\n");
+        printf("[HTTP]  IP/hostname não resolvido\n");
         return false;
     }
 
