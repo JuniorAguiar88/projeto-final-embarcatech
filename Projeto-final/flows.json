@@ -1,0 +1,203 @@
+[
+    {
+        "id": "9a4aeff0ab9b1fd9",
+        "type": "function",
+        "z": "5fb46865f5442694",
+        "name": "Formatar para UI",
+        "func": "// Converte payload JSON para formato UI\ntry {\n    var data = msg.payload;\n    \n    // Formato esperado pelos charts UI:\n    // msg.payload = valor_numérico\n    \n    // Temperatura\n    var msgTemp = { payload: parseFloat(data.temperatura) };\n    \n    // Umidade\n    var msgUmid = { payload: parseFloat(data.umidade) };\n    \n    // Status (texto)\n    var msgStatus = { payload: data.status || \"DESCONHECIDO\" };\n    \n    return [msgTemp, msgUmid, msgStatus];\n} catch(e) {\n    node.error(\"Erro ao formatar: \" + e.message);\n    return null;\n}",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 180,
+        "wires": [
+            [
+                "932c56cd3ca04f15"
+            ],
+            [
+                "5ccfadbc668480ae"
+            ],
+            [
+                "5743aede0640bd23"
+            ]
+        ]
+    },
+    {
+        "id": "4fc87d464af684e2",
+        "type": "debug",
+        "z": "5fb46865f5442694",
+        "name": "Payload Bruto",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 330,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "ec0139ee2df91de4",
+        "type": "http in",
+        "z": "5fb46865f5442694",
+        "name": "",
+        "url": "/cofre-data",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 180,
+        "wires": [
+            [
+                "330095837ff7b40b",
+                "4fc87d464af684e2"
+            ]
+        ]
+    },
+    {
+        "id": "330095837ff7b40b",
+        "type": "json",
+        "z": "5fb46865f5442694",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 330,
+        "y": 180,
+        "wires": [
+            [
+                "9a4aeff0ab9b1fd9"
+            ]
+        ]
+    },
+    {
+        "id": "932c56cd3ca04f15",
+        "type": "ui_chart",
+        "z": "5fb46865f5442694",
+        "name": "",
+        "group": "group1",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "label": "🌡️ Temperatura (°C)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "Aguardando dados...",
+        "dot": false,
+        "ymin": "15",
+        "ymax": "40",
+        "removeOlder": "5",
+        "removeOlderPoints": "100",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#ff7f0e",
+            "#aec7e8",
+            "#ff7f0e"
+        ],
+        "outputs": 1,
+        "x": 750,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5ccfadbc668480ae",
+        "type": "ui_chart",
+        "z": "5fb46865f5442694",
+        "name": "",
+        "group": "group1",
+        "order": 2,
+        "width": "6",
+        "height": "4",
+        "label": "💧 Umidade (%)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "Aguardando dados...",
+        "dot": false,
+        "ymin": "20",
+        "ymax": "90",
+        "removeOlder": "5",
+        "removeOlderPoints": "100",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#2ca02c",
+            "#98df8a",
+            "#2ca02c"
+        ],
+        "outputs": 1,
+        "x": 750,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5743aede0640bd23",
+        "type": "ui_text",
+        "z": "5fb46865f5442694",
+        "group": "group1",
+        "order": 3,
+        "width": "4",
+        "height": "2",
+        "name": "",
+        "label": "🔒 Status",
+        "format": "<b style='color:{{msg.payload == \"ABERTO\" ? \"green\" : \"red\"}}'>{{msg.payload}}</b>",
+        "layout": "row-spread",
+        "x": 750,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "60bb5ceb90f62d89",
+        "type": "http response",
+        "z": "5fb46865f5442694",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 750,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "group1",
+        "type": "ui_group",
+        "name": "Monitoramento do Cofre",
+        "tab": "tab1",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "tab1",
+        "type": "ui_tab",
+        "name": "Cofre Inteligente",
+        "icon": "lock",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "378fcf4c07ffde7d",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.6"
+        }
+    }
+]
